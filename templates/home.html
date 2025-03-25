@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - ERP{% endblock %}
+
+{% block content %}
+    <h2>Bienvenido al ERP</h2>
+    <button hx-get="{% url 'load_data' %}" hx-target="#data-container">Cargar Datos</button>
+    
+    <div id="data-container">
+        <p>Haz clic en el botón para cargar datos dinámicamente.</p>
+    </div>
+{% endblock %}
