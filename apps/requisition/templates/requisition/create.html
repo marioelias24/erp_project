@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Crear Requisición</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.departamento.label_tag }} {{ form.departamento }}<br><br>
+    {{ form.fecha_solicitud.label_tag }} {{ form.fecha_solicitud }}<br><br>
+    {{ form.cargo.label_tag }} {{ form.cargo }}<br><br>
+    {{ form.responsable.label_tag }} {{ form.responsable }}<br><br>
+
+    <h4>Artículos</h4>
+    {{ formset.management_form }}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Artículo</th>
+                <th>Cantidad</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody id="formset-body">
+            {% for form in formset %}
+            <tr>
+                <td>{{ form.articulo }}</td>
+                <td>{{ form.cantidad }}</td>
+                <td>{% if form.can_delete %}{{ form.DELETE }}{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button type="button" id="add-row">➕ Agregar línea</button>
+
+    <hr>
+    <h4>Finalidad de la Compra</h4>
+    <div>
+        {{ form.finalidad.label_tag }}<br>
+        {{ form.finalidad }}
+    </div>
+
+    <br><br>
+    <button type="submit">Guardar</button>
+</form>
+
+<!-- Fila oculta para clonar -->
+<div style="display: none;">
+    <table>
+        <tr id="empty-form-template">
+            <td><input type="text" name="items-__prefix__-articulo" id="id_items-__prefix__-articulo"></td>
+            <td><input type="number" name="items-__prefix__-cantidad" id="id_items-__prefix__-cantidad"></td>
+            <td><button type="button" class="remove-row">🗑</button>
+                <input type="checkbox" name="items-__prefix__-DELETE" id="id_items-__prefix__-DELETE" style="display: none;">
+            </td>
+        </tr>
+    </table>
+</div>
+
+<a href="{% url 'requisition_list' %}">← Volver a la lista</a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const addRowBtn = document.getElementById('add-row');
+    const formsetBody = document.getElementById('formset-body');
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+    const emptyForm = document.getElementById('empty-form-template');
+
+    function addDeleteEvent(button, row) {
+        button.addEventListener('click', function () {
+            row.remove();
+            updateIndexes();
+        });
+    }
+
+    function updateIndexes() {
+        const rows = formsetBody.querySelectorAll('tr');
+        totalForms.value = rows.length;
+        rows.forEach((row, index) => {
+            row.querySelectorAll('input').forEach(input => {
+                if (input.name) {
+                    input.name = input.name.replace(/items-\d+-/, `items-${index}-`);
+                }
+                if (input.id) {
+                    input.id = input.id.replace(/id_items-\d+-/, `id_items-${index}-`);
+                }
+            });
+        });
+    }
+
+    addRowBtn.addEventListener('click', function () {
+        const formIndex = parseInt(totalForms.value);
+        const newRow = emptyForm.cloneNode(true);
+        newRow.removeAttribute('id');
+        newRow.style.display = '';
+        newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, formIndex);
+        formsetBody.appendChild(newRow);
+
+        const deleteBtn = newRow.querySelector('.remove-row');
+        addDeleteEvent(deleteBtn, newRow);
+
+        totalForms.value = formIndex + 1;
+    });
+
+    document.querySelectorAll('.remove-row').forEach(btn => {
+        const row = btn.closest('tr');
+        addDeleteEvent(btn, row);
+    });
+});
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const finalidad = document.querySelector('textarea[name="finalidad"]');
+        if (finalidad) {
+            finalidad.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        }
+    });
+</script>
+{% endblock %}
