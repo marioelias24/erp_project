@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ requisition.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ requisition.name }}</h2>
+    <p><strong>Responsable:</strong> {{ requisition.responsable }}</p>
+    <p><strong>Departamento:</strong> {{ requisition.get_departamento_display }}</p>
+    <p><strong>Cargo:</strong> {{ requisition.get_cargo_display }}</p>
+    <p><strong>Fecha de Solicitud:</strong> {{ requisition.fecha_solicitud }}</p>
+    <p><strong>Finalidad:</strong> {{ requisition.finalidad }}</p>
+    <p><strong>Fecha de Creación:</strong> {{ requisition.created_at }}</p>
+
+    <hr>
+
+    <h4>Productos o Servicios</h4>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Artículo</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in requisition.items.all %}
+            <tr>
+                <td>{{ item.articulo }}</td>
+                <td>{{ item.cantidad }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">Sin artículos.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
