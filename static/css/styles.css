@@ -1,69 +1,184 @@
+/*---------------------------------------------------
+  1) RESET / BASE
+---------------------------------------------------*/
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
-    margin: 20px;
+    margin: 0;
     padding: 20px;
-}
-
-h1 {
-    color: #333;
-}
-
-nav a {
-    color: blue;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  
+  /*---------------------------------------------------
+    2) NAVBAR
+  ---------------------------------------------------*/
+  .main-nav {
+    background: #0056b3;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  .main-nav .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+  }
+  .main-nav .brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
     text-decoration: none;
-    margin-right: 10px;
-}
-
-button {
+  }
+  .main-nav .nav-links {
+    display: flex;
+    gap: 1rem;
+  }
+  .main-nav .nav-links a {
+    color: white;
+    text-decoration: none;
+  }
+  .main-nav .nav-links a:hover {
+    text-decoration: underline;
+  }
+  
+  /*---------------------------------------------------
+    3) CONTENEDOR CENTRAL
+  ---------------------------------------------------*/
+  .container {
+    max-width: 1024px;
+    margin: 0 auto;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  /*---------------------------------------------------
+    4) BOTONES
+  ---------------------------------------------------*/
+  button, .btn {
     background-color: #007bff;
     color: white;
-    padding: 10px 15px;
+    padding: 0.5rem 1rem;
     border: none;
     cursor: pointer;
-}
-
-button:hover {
+    border-radius: 4px;
+  }
+  button:hover, .btn:hover {
     background-color: #0056b3;
-}
-
-/* Estilos para la tabla */
-table {
+  }
+  
+  /*---------------------------------------------------
+    5) TABLA DE LISTADO
+  ---------------------------------------------------*/
+  table.list-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
-    margin-top: 20px;
-}
-
-th, td {
+    margin-top: 1rem;
+  
+    /* usa layout automático para que cada columna crezca según contenido */
+    table-layout: auto;
+  }
+  table.list-table th,
+  table.list-table td {
     border: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
-}
-
-th {
+    padding: 0.75rem;
+    vertical-align: top;
+    white-space: normal;    /* permite saltos de línea */
+    word-break: break-word;  /* rompe palabras muy largas */
+  }
+  table.list-table th {
     background-color: #007bff;
     color: white;
-    font-weight: bold;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-tr:hover {
-    background-color: #ddd;
-}
-
-/* Espaciado del contenido */
-.container {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-.campo-finalidad:invalid {
+    font-weight: 600;
+  }
+  table.list-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  /* anchos máximos/fijos para columnas críticas */
+  table.list-table th:nth-child(1),
+  table.list-table td:nth-child(1) { width: 6rem; }  /* Código */
+  table.list-table th:nth-child(2),
+  table.list-table td:nth-child(2) { width: 8rem; }  /* Departamento */
+  table.list-table th:nth-child(3),
+  table.list-table td:nth-child(3) { width: 8rem; }  /* Cargo */
+  table.list-table th:nth-child(4),
+  table.list-table td:nth-child(4) { width: 10rem; } /* Fecha de solicitud */
+  table.list-table th:nth-child(5),
+  table.list-table td:nth-child(5) { width: 10rem; } /* Responsable */
+  table.list-table th:nth-child(6),
+  table.list-table td:nth-child(6) { max-width: 15rem; } /* Finalidad */
+  table.list-table th:nth-child(7),
+  table.list-table td:nth-child(7) { width: 12rem; } /* Fecha creación */
+  
+  /*---------------------------------------------------
+    6) TABLA DEL FORMULARIO CON FORMSET
+  ---------------------------------------------------*/
+  table.form-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    table-layout: fixed;   /* anchos fijos, no crece con contenido */
+  }
+  table.form-table th,
+  table.form-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    vertical-align: top;
+  }
+  table.form-table th {
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+  }
+  /* columna “Cantidad” estrecha */
+  table.form-table th:nth-child(2),
+  table.form-table td:nth-child(2) {
+    width: 6rem;
+    white-space: nowrap;
+  }
+  /* columna “Eliminar” muy estrecha */
+  table.form-table th:nth-child(3),
+  table.form-table td:nth-child(3) {
+    width: 4rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  /* inputs dentro del formset */
+  table.form-table td input[type="text"] {
+    width: 100%;
+  }
+  table.form-table td input[type="number"] {
+    width: 4em;
+  }
+  
+  /* ocultar checkbox DELETE del inlineformset */
+  input[name$="-DELETE"] {
+    display: none;
+  }
+  
+  /*---------------------------------------------------
+    7) TEXTAREAS RESIZABLES
+  ---------------------------------------------------*/
+  textarea,
+  table td textarea,
+  textarea[name="finalidad"],
+  .campo-finalidad {
+    width: 100%;
+    min-height: 3rem;
+    overflow: hidden;
+    resize: vertical;
+  }
+  
+  /* cuando la finalidad esté inválida */
+  .campo-finalidad:invalid {
     border: 2px solid red;
     background-color: #ffe6e6;
-}
+  }
+  
