@@ -1,39 +1,54 @@
 {% extends 'base.html' %}
-
-{% block title %}{{ requisition.name }}{% endblock %}
+{% block title %}Detalle de {{ requisition.name }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>{{ requisition.name }}</h2>
-    <p><strong>Responsable:</strong> {{ requisition.responsable }}</p>
-    <p><strong>Departamento:</strong> {{ requisition.get_departamento_display }}</p>
-    <p><strong>Cargo:</strong> {{ requisition.get_cargo_display }}</p>
-    <p><strong>Fecha de Solicitud:</strong> {{ requisition.fecha_solicitud }}</p>
-    <p><strong>Finalidad:</strong> {{ requisition.finalidad }}</p>
-    <p><strong>Fecha de Creación:</strong> {{ requisition.created_at }}</p>
+  <div class="bg-white shadow rounded-lg p-6">
+    <!-- Encabezado de la requisición -->
+    <h2 class="text-xl font-bold mb-4">{{ requisition.name }}</h2>
+    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mb-6">
+      <div><span class="font-semibold">Responsable:</span> {{ requisition.responsable }}</div>
+      <div><span class="font-semibold">Departamento:</span> {{ requisition.get_departamento_display }}</div>
+      <div><span class="font-semibold">Cargo:</span> {{ requisition.get_cargo_display }}</div>
+      <div><span class="font-semibold">Fecha solicitud:</span> {{ requisition.fecha_solicitud|date:"F d, Y" }}</div>
+      <div><span class="font-semibold">Creado:</span> {{ requisition.created_at|date:"F j, Y, g:i a" }}</div>
+    </dl>
 
-    <hr>
+    <hr class="my-4">
 
-    <h4>Productos o Servicios</h4>
-    <table border="1" cellpadding="5">
-        <thead>
-            <tr>
-                <th>Artículo</th>
-                <th>Cantidad</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in requisition.items.all %}
-            <tr>
-                <td>{{ item.articulo }}</td>
-                <td>{{ item.cantidad }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="2">Sin artículos.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+    <!-- Tabla de ítems -->
+    <h3 class="font-semibold mb-2">Productos o Servicios</h3>
+    <table class="min-w-full table-auto bg-white rounded-lg overflow-hidden shadow mb-6">
+      <thead class="bg-primary text-white">
+        <tr>
+          <th class="px-4 py-2 text-left">Artículo</th>
+          <th class="px-4 py-2 text-right w-24">Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in requisition.items.all %}
+        <tr class="border-b hover:bg-gray-50">
+          <td class="px-4 py-3">{{ item.articulo }}</td>
+          <td class="px-4 py-3 text-right">{{ item.cantidad }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="2" class="px-4 py-3 text-center text-gray-500">Sin ítems agregados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
-</div>
+
+    <!-- Aquí insertamos Finalidad *debajo* de la tabla -->
+    <div class="mb-6">
+      <h4 class="font-semibold">Finalidad de la Compra</h4>
+      <p class="mt-1">{{ requisition.finalidad }}</p>
+    </div>
+
+    <div>
+      <a href="{% url 'requisition_list' %}"
+         class="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300">
+        ← Volver a la lista
+      </a>
+    </div>
+  </div>
 {% endblock %}

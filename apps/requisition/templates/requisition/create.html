@@ -13,22 +13,25 @@
     <h4>Artículos</h4>
     {{ formset.management_form }}
 
-    <table>
-        <thead>
-            <tr>
-                <th>Artículo</th>
-                <th>Cantidad</th>
-                <th>Eliminar</th>
-            </tr>
+    <table class="form-table min-w-full bg-white shadow rounded-lg overflow-hidden">
+        <thead class="bg-primary text-white">
+          <tr>
+            <th class="px-4 py-2">Artículo</th>
+            <th class="px-4 py-2 w-24">Cantidad</th>
+            <th class="px-4 py-2 w-16">Eliminar</th>
+          </tr>
         </thead>
-        <tbody id="formset-body">
-            {% for form in formset %}
-            <tr>
-                <td>{{ form.articulo }}</td>
-                <td>{{ form.cantidad }}</td>
-                <td>{% if form.can_delete %}{{ form.DELETE }}{% endif %}</td>
-            </tr>
-            {% endfor %}
+        <tbody>
+          {% for form in formset %}
+          <tr class="border-b hover:bg-gray-50">
+            <td class="px-4 py-2">{{ form.articulo }}</td>
+            <td class="px-4 py-2">{{ form.cantidad }}</td>
+            <td class="px-4 py-2 text-center">
+              <button type="button" class="text-red-600 hover:text-red-800">🗑</button>
+              {{ form.DELETE }}
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
     </table>
 
@@ -49,12 +52,16 @@
 <div style="display: none;">
     <table>
         <tr id="empty-form-template">
-            <td><input type="text" name="items-__prefix__-articulo" id="id_items-__prefix__-articulo"></td>
-            <td><input type="number" name="items-__prefix__-cantidad" id="id_items-__prefix__-cantidad"></td>
-            <td><button type="button" class="remove-row">🗑</button>
-                <input type="checkbox" name="items-__prefix__-DELETE" id="id_items-__prefix__-DELETE" style="display: none;">
+            <td><input … name="items-__prefix__-articulo" …></td>
+            <td><input … name="items-__prefix__-cantidad" …></td>
+            <td>
+              <button type="button" class="remove-row">🗑</button>
+              <input type="checkbox"
+                     name="items-__prefix__-DELETE"
+                     id="id_items-__prefix__-DELETE"
+                     style="display: none;">
             </td>
-        </tr>
+        </tr>          
     </table>
 </div>
 
@@ -120,6 +127,49 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.style.height = this.scrollHeight + 'px';
             });
         }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const table = document.querySelector('table');
+      const ths = table.querySelectorAll('th');
+    
+      ths.forEach((th, colIndex) => {
+        // 1) Crear y anexar el handler
+        const resizer = document.createElement('div');
+        resizer.classList.add('column-resizer');
+        th.appendChild(resizer);
+    
+        // Variables para el drag
+        let startX, startWidth;
+    
+        // 2) Al empezar a arrastrar
+        resizer.addEventListener('mousedown', (e) => {
+          startX = e.pageX;
+          startWidth = th.offsetWidth;
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+    
+        function onMouseMove(e) {
+          const delta = e.pageX - startX;
+          const newWidth = startWidth + delta;
+          if (newWidth > 30) {  // ancho mínimo
+            // Ajustamos ancho en el th...
+            th.style.width = newWidth + 'px';
+            // ...y en todas las celdas de esa columna
+            table.querySelectorAll('tr').forEach(row => {
+              const cell = row.children[colIndex];
+              if (cell) cell.style.width = newWidth + 'px';
+            });
+          }
+        }
+    
+        function onMouseUp() {
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        }
+      });
     });
 </script>
 {% endblock %}

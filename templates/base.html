@@ -1,26 +1,52 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ERP System{% endblock %}</title>
+
+    <!-- 1) Primero Tailwind (preflight, utilidades, etc.) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 2) Después tu propio CSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-<body>
-
-    <header>
+<body class="bg-gray-100 text-gray-800">
+    <!-- NAVBAR -->
+    <nav class="bg-primary text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+          <a href="/" class="text-2xl font-bold">Mi ERP</a>
+          <ul class="flex space-x-4">
+            <li><a href="/" class="hover:underline">Inicio</a></li>
+            <li><a href="{% url 'requisition_list' %}" class="hover:underline">Requisiciones</a></li>
+          </ul>
+        </div>
+    </nav>
+    <!-- <header>
         <h1>Mi ERP</h1>
         <nav>
             <a href="/">Inicio</a>
             <a href="/requisition/">Requisiciones</a>
         </nav>
-    </header>
+    </header> -->
 
-    <main>
+    <main class="container mx-auto p-6">
         {% block content %}{% endblock %}
     </main>
 
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const toggle = document.querySelector('.nav-toggle');
+          const links = document.querySelector('.nav-links');
+          if (toggle && links) {
+            toggle.addEventListener('click', () => {
+              links.classList.toggle('show');
+            });
+          }
+        });
+    </script>
+    {% endblock %}
 </body>
 </html>
