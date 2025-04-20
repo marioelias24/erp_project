@@ -1,0 +1,51 @@
+{# apps/requisition/templates/requisition/list.html #}
+{% extends 'base.html' %}
+{% block title %}David - Solicitudes{% endblock %}
+
+{% block content %}
+  <div class="bg-white shadow rounded-lg p-6">
+    <h2 class="text-xl font-semibold mb-4">Solicitudes de compra</h2>
+    <a href="{% url 'requisition_create' %}"
+    class="inline-block mb-4 bg-blue-600 text-white font-medium px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+      Nuevo
+    </a>
+
+    <table class="min-w-full table-auto bg-white rounded-lg overflow-hidden shadow">
+      <thead class="bg-blue-600 text-white">
+        <tr>
+          <th class="px-4 py-2 text-left">Código</th>
+          <th class="px-4 py-2 text-left">Departamento</th>
+          <th class="px-4 py-2 text-left">Cargo</th>
+          <th class="px-4 py-2 text-left">Fecha de Solicitud</th>
+          <th class="px-4 py-2 text-left">Responsable</th>
+          <th class="px-4 py-2 text-left">Finalidad</th>
+          <th class="px-4 py-2 text-left">Creado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in requisitions %}
+        <tr class="border-b hover:bg-gray-50">
+          <td class="px-4 py-3">
+            <a href="{% url 'requisition_detail' req.pk %}"
+               class="text-blue-600 hover:underline">
+              {{ req.name }}
+            </a>
+          </td>
+          <td class="px-4 py-3">{{ req.get_departamento_display }}</td>
+          <td class="px-4 py-3">{{ req.get_cargo_display }}</td>
+          <td class="px-4 py-3">{{ req.fecha_solicitud|date:"F j, Y" }}</td>
+          <td class="px-4 py-3">{{ req.responsable }}</td>
+          <td class="px-4 py-3">{{ req.finalidad }}</td>
+          <td class="px-4 py-3">{{ req.created_at|date:"F j, Y, g:i a" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="px-4 py-3 text-center text-gray-500">
+            No hay requisiciones registradas.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
