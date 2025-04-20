@@ -1,175 +1,195 @@
+{# apps/requisition/templates/requisition/create.html #}
 {% extends 'base.html' %}
+{% block title %}Borrador{% endblock %}
 
 {% block content %}
-<h2>Crear Requisición</h2>
+  <h1 class="text-4xl font-extrabold text-gray-900 mb-6">Borrador</h1>
 
-<form method="post">
+  <form method="post" class="space-y-6">
     {% csrf_token %}
-    {{ form.departamento.label_tag }} {{ form.departamento }}<br><br>
-    {{ form.fecha_solicitud.label_tag }} {{ form.fecha_solicitud }}<br><br>
-    {{ form.cargo.label_tag }} {{ form.cargo }}<br><br>
-    {{ form.responsable.label_tag }} {{ form.responsable }}<br><br>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        {{ form.departamento.label_tag }}<br>
+        {{ form.departamento }}
+      </div>
+      <div>
+        {{ form.fecha_solicitud.label_tag }}<br>
+        {{ form.fecha_solicitud }}
+      </div>
+      <div>
+        {{ form.cargo.label_tag }}<br>
+        {{ form.cargo }}
+      </div>
+      <div>
+        {{ form.responsable.label_tag }}<br>
+        {{ form.responsable }}
+      </div>
+    </div>
 
-    <h4>Artículos</h4>
-    {{ formset.management_form }}
-
-    <table class="form-table min-w-full bg-white shadow rounded-lg overflow-hidden">
-        <thead class="bg-primary text-white">
+    <section>
+      <h2 class="text-2xl font-semibold mt-8 mb-4">Artículos</h2>
+      {{ formset.management_form }}
+      <table class="form-table w-full bg-white shadow rounded-lg overflow-hidden">
+        <thead class="bg-blue-600 text-white">
           <tr>
             <th class="px-4 py-2">Artículo</th>
             <th class="px-4 py-2 w-24">Cantidad</th>
             <th class="px-4 py-2 w-16">Eliminar</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="formset-body">
           {% for form in formset %}
-          <tr class="border-b hover:bg-gray-50">
-            <td class="px-4 py-2">{{ form.articulo }}</td>
-            <td class="px-4 py-2">{{ form.cantidad }}</td>
-            <td class="px-4 py-2 text-center">
-              <button type="button" class="text-red-600 hover:text-red-800">🗑</button>
-              {{ form.DELETE }}
-            </td>
-          </tr>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="px-4 py-2">{{ form.articulo }}</td>
+              <td class="px-4 py-2">{{ form.cantidad }}</td>
+              <td class="px-4 py-2 text-center">
+                <button type="button" class="remove-row text-red-600 hover:text-red-800">🗑</button>
+                {{ form.DELETE }}
+              </td>
+            </tr>
           {% endfor %}
         </tbody>
-    </table>
+      </table>
+      <button
+        type="button"
+        id="add-row"
+        class="inline-block mb-4 bg-blue-600 text-white font-medium px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+      >
+        ➕ Agregar línea
+      </button>
 
-    <button type="button" id="add-row">➕ Agregar línea</button>
+      {# plantilla oculta para clonar #}
+      <div style="display: none;">
+        <table>
+          <tr id="empty-form-template">
+            <td>
+              <textarea
+                name="items-__prefix__-articulo"
+                rows="1"
+                placeholder="Nombre del artículo"
+                style="width:100%;box-sizing:border-box;overflow:hidden;resize:vertical;"
+                oninput="autoGrow(this)"
+              ></textarea>
+            </td>
+            <td>
+              <input
+                type="number"
+                name="items-__prefix__-cantidad"
+                min="1"
+                class="w-16 box-border"
+              >
+            </td>
+            <td class="text-center">
+              <button type="button" class="remove-row">🗑</button>
+              <input
+                type="checkbox"
+                name="items-__prefix__-DELETE"
+                id="id_items-__prefix__-DELETE"
+                style="display:none;"
+              >
+            </td>
+          </tr>          
+        </table>
+      </div>
+    </section>
 
-    <hr>
-    <h4>Finalidad de la Compra</h4>
-    <div>
+    <section>
+      <h2 class="text-2xl font-semibold mt-8 mb-2">Finalidad de la Compra</h2>
+      <div>
         {{ form.finalidad.label_tag }}<br>
         {{ form.finalidad }}
+      </div>
+    </section>
+
+    <div class="mt-8 flex items-center">
+      <button
+        type="submit"
+        class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      >
+        Guardar
+      </button>
+      <a
+        href="{% url 'requisition_list' %}"
+        class="ml-4 text-gray-600 hover:underline"
+      >
+        ← Volver a la lista
+      </a>
     </div>
-
-    <br><br>
-    <button type="submit">Guardar</button>
-</form>
-
-<!-- Fila oculta para clonar -->
-<div style="display: none;">
-    <table>
-        <tr id="empty-form-template">
-            <td><input … name="items-__prefix__-articulo" …></td>
-            <td><input … name="items-__prefix__-cantidad" …></td>
-            <td>
-              <button type="button" class="remove-row">🗑</button>
-              <input type="checkbox"
-                     name="items-__prefix__-DELETE"
-                     id="id_items-__prefix__-DELETE"
-                     style="display: none;">
-            </td>
-        </tr>          
-    </table>
-</div>
-
-<a href="{% url 'requisition_list' %}">← Volver a la lista</a>
+  </form>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const addRowBtn = document.getElementById('add-row');
-    const formsetBody = document.getElementById('formset-body');
-    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
-    const emptyForm = document.getElementById('empty-form-template');
-
-    function addDeleteEvent(button, row) {
-        button.addEventListener('click', function () {
-            row.remove();
-            updateIndexes();
-        });
+  {{ block.super }}
+  <script>
+    // función global para autosize
+    function autoGrow(el){
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
     }
+  
+    document.addEventListener('DOMContentLoaded', function() {
+      // ... tu código de clonado existente ...
+  
+      // tras clonar, vuelve a enlazar autoGrow al nuevo textarea:
+      addRowBtn.addEventListener('click', () => {
+        // ...
+        const textarea = clone.querySelector('textarea');
+        if(textarea) textarea.addEventListener('input', () => autoGrow(textarea));
+      });
+  
+      // y para los que ya venían en la página:
+      document.querySelectorAll('textarea').forEach(tx => {
+        tx.addEventListener('input', () => autoGrow(tx));
+      });
+    });
+  </script>  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const addRowBtn   = document.getElementById('add-row');
+      const formsetBody = document.getElementById('formset-body');
+      const totalForms  = document.getElementById('id_items-TOTAL_FORMS');
+      const emptyForm   = document.getElementById('empty-form-template');
 
-    function updateIndexes() {
+      function addDeleteEvent(btn, row) {
+        btn.addEventListener('click', () => {
+          row.remove();
+          updateIndexes();
+        });
+      }
+
+      function updateIndexes() {
         const rows = formsetBody.querySelectorAll('tr');
         totalForms.value = rows.length;
         rows.forEach((row, index) => {
-            row.querySelectorAll('input').forEach(input => {
-                if (input.name) {
-                    input.name = input.name.replace(/items-\d+-/, `items-${index}-`);
-                }
-                if (input.id) {
-                    input.id = input.id.replace(/id_items-\d+-/, `id_items-${index}-`);
-                }
-            });
+          row.querySelectorAll('input').forEach(input => {
+            if (input.name) {
+              input.name = input.name.replace(/items-\\d+-/, `items-${index}-`);
+            }
+            if (input.id) {
+              input.id = input.id.replace(/id_items-\\d+-/, `id_items-${index}-`);
+            }
+          });
         });
-    }
+      }
 
-    addRowBtn.addEventListener('click', function () {
-        const formIndex = parseInt(totalForms.value);
-        const newRow = emptyForm.cloneNode(true);
-        newRow.removeAttribute('id');
-        newRow.style.display = '';
-        newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, formIndex);
-        formsetBody.appendChild(newRow);
+      // enlazar botón Agregar
+      addRowBtn.addEventListener('click', () => {
+        const idx = parseInt(totalForms.value, 10);
+        const clone = emptyForm.cloneNode(true);
+        clone.removeAttribute('id');
+        clone.style.display = '';
+        clone.innerHTML = clone.innerHTML.replace(/__prefix__/g, idx);
+        formsetBody.appendChild(clone);
 
-        const deleteBtn = newRow.querySelector('.remove-row');
-        addDeleteEvent(deleteBtn, newRow);
+        addDeleteEvent(clone.querySelector('.remove-row'), clone);
+        totalForms.value = idx + 1;
+      });
 
-        totalForms.value = formIndex + 1;
-    });
-
-    document.querySelectorAll('.remove-row').forEach(btn => {
+      // enlazar botones de borrar existentes
+      document.querySelectorAll('.remove-row').forEach(btn => {
         const row = btn.closest('tr');
         addDeleteEvent(btn, row);
-    });
-});
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const finalidad = document.querySelector('textarea[name="finalidad"]');
-        if (finalidad) {
-            finalidad.addEventListener('input', function () {
-                this.style.height = 'auto';
-                this.style.height = this.scrollHeight + 'px';
-            });
-        }
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const table = document.querySelector('table');
-      const ths = table.querySelectorAll('th');
-    
-      ths.forEach((th, colIndex) => {
-        // 1) Crear y anexar el handler
-        const resizer = document.createElement('div');
-        resizer.classList.add('column-resizer');
-        th.appendChild(resizer);
-    
-        // Variables para el drag
-        let startX, startWidth;
-    
-        // 2) Al empezar a arrastrar
-        resizer.addEventListener('mousedown', (e) => {
-          startX = e.pageX;
-          startWidth = th.offsetWidth;
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
-        });
-    
-        function onMouseMove(e) {
-          const delta = e.pageX - startX;
-          const newWidth = startWidth + delta;
-          if (newWidth > 30) {  // ancho mínimo
-            // Ajustamos ancho en el th...
-            th.style.width = newWidth + 'px';
-            // ...y en todas las celdas de esa columna
-            table.querySelectorAll('tr').forEach(row => {
-              const cell = row.children[colIndex];
-              if (cell) cell.style.width = newWidth + 'px';
-            });
-          }
-        }
-    
-        function onMouseUp() {
-          document.removeEventListener('mousemove', onMouseMove);
-          document.removeEventListener('mouseup', onMouseUp);
-        }
       });
     });
-</script>
+  </script>
 {% endblock %}

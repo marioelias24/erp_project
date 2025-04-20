@@ -23,7 +23,7 @@ class Requisition(models.Model):
     fecha_solicitud = models.DateField()
     cargo = models.CharField(max_length=50, choices=CARGO_CHOICES)
     responsable = models.CharField(max_length=100)
-    finalidad = models.CharField(max_length=100)
+    finalidad = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -32,7 +32,7 @@ class Requisition(models.Model):
 
 class RequisitionItem(models.Model):
     requisition = models.ForeignKey(Requisition, related_name='items', on_delete=models.CASCADE)
-    articulo = models.CharField(max_length=100)
+    articulo = models.CharField(max_length=300)
     cantidad = models.PositiveIntegerField()
 
     def __str__(self):

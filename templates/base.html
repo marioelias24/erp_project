@@ -11,42 +11,44 @@
 
     <!-- 2) Después tu propio CSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body class="bg-gray-100 text-gray-800">
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+
     <!-- NAVBAR -->
-    <nav class="bg-primary text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-          <a href="/" class="text-2xl font-bold">Mi ERP</a>
-          <ul class="flex space-x-4">
-            <li><a href="/" class="hover:underline">Inicio</a></li>
-            <li><a href="{% url 'requisition_list' %}" class="hover:underline">Requisiciones</a></li>
-          </ul>
-        </div>
+    {% if request.resolver_match.url_name != 'home' %}
+    <nav class="bg-white shadow sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        {# En la izquierda pongo sólo el nombre de la app #}
+        <a href="{% url 'home' %}" class="text-2xl font-bold text-blue-600">
+          Requisiciones
+        </a>
+        <ul class="flex space-x-4">
+          <li>
+            <a href="{% url 'requisition_list' %}"
+              class="text-gray-700 hover:text-blue-600">
+              Lista
+            </a>
+          </li>
+        </ul>
+      </div>
     </nav>
-    <!-- <header>
-        <h1>Mi ERP</h1>
-        <nav>
-            <a href="/">Inicio</a>
-            <a href="/requisition/">Requisiciones</a>
-        </nav>
-    </header> -->
+    {% endif %}
 
     <main class="container mx-auto p-6">
-        {% block content %}{% endblock %}
+      {% block content %}{% endblock %}
     </main>
 
     {% block extra_js %}
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const toggle = document.querySelector('.nav-toggle');
-          const links = document.querySelector('.nav-links');
-          if (toggle && links) {
-            toggle.addEventListener('click', () => {
-              links.classList.toggle('show');
-            });
-          }
-        });
+      document.addEventListener('DOMContentLoaded', () => {
+        const toggle = document.querySelector('.nav-toggle');
+        const links  = document.querySelector('.nav-links');
+        if (toggle && links) {
+          toggle.addEventListener('click', () => links.classList.toggle('show'));
+        }
+      });
     </script>
     {% endblock %}
-</body>
+
+  </body>
 </html>
